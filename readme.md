@@ -9,11 +9,11 @@ MITRE ATT&CK mapping, and incident response.
 
 ## 🏗️ Lab Architecture
 
-| Component        | Role                    | IP               |
-|-----------------|-------------------------|------------------|
-| Ubuntu Server   | Wazuh SIEM Manager      | 192.168.40.136   |
-| Windows 10 VM   | Target / Wazuh Agent    | 192.168.40.139   |
-| Kali Linux      | Attacker Machine        | 192.168.40.128   |
+| Component        | Role                    
+|-----------------|-------------------------|
+| Ubuntu Server   | Wazuh SIEM Manager      | 
+| Windows 10 VM   | Target / Wazuh Agent    | 
+| Kali Linux      | Attacker Machine        | 
 
 ---
 
@@ -43,14 +43,14 @@ MITRE ATT&CK mapping, and incident response.
 
 ## 🔍 SOC L1 Analysis Performed
 
-- ✅ Alert triage and severity classification
-- ✅ MITRE ATT&CK technique mapping
-- ✅ Attack timeline reconstruction
-- ✅ IOC (Indicator of Compromise) documentation
-- ✅ Wazuh rule analysis (Rule IDs: 92201, 92021, 60107, 60104)
-- ✅ Incident report writing
-- ✅ Log correlation across multiple events
-- ✅ Windows Event ID analysis (4688, 4625, 4672, 5001)
+- Alert triage and severity classification
+-  MITRE ATT&CK technique mapping
+-  Attack timeline reconstruction
+-  IOC (Indicator of Compromise) documentation
+-  Wazuh rule analysis (Rule IDs: 92201, 92021, 60107, 60104)
+-  Incident report writing
+-  Log correlation across multiple events
+-  Windows Event ID analysis (4688, 4625, 4672, 5001)
 
 ---
 
@@ -83,9 +83,12 @@ MITRE ATT&CK mapping, and incident response.
 
 ---
 
+
 ## 📁 Repository Structure
 
 \`\`\`
+
+
 home-soc-lab/
 │
 ├── 📂 configs/
@@ -115,7 +118,8 @@ home-soc-lab/
 
 ---
 
-## 📊 Key Wazuh Alerts Detected
+
+##  Key Wazuh Alerts Detected
 
 | Rule ID | Level | Description                              |
 |---------|-------|------------------------------------------|
@@ -129,7 +133,7 @@ home-soc-lab/
 
 ---
 
-## 🎯 Skills Demonstrated
+##  Skills Demonstrated
 
 \`\`\`
 Blue Team
@@ -150,7 +154,7 @@ Red Team (Attack Simulation)
 
 ---
 
-## 📚 What I Learned
+##  What I Learned
 
 - How attackers use built-in Windows tools (LOLBins) 
   to evade detection
@@ -179,7 +183,6 @@ Red Team (Attack Simulation)
 
 **Malaika**  
 Aspiring SOC Analyst | Blue Team Enthusiast  
-📧 malaikaumbreen04@gmail.com
 
 *Built as part of self-directed cybersecurity 
 training toward SOC L1 certification*
