@@ -1,188 +1,184 @@
-# 🛡️ Home SOC Lab — Threat Detection & Incident Response
+# 🛡️ Home SOC Lab — Security Operations Center Deployment
 
-A hands-on Security Operations Center (SOC) home lab built 
-to simulate real-world cyberattacks and practice L1 SOC 
-analyst skills including alert triage, log analysis, 
-MITRE ATT&CK mapping, and incident response.
+> A hands-on, self-hosted Security Operations Center (SOC) lab built for learning real-world threat detection, log analysis, and incident response. This repository documents the full deployment process — from infrastructure setup to live alerting.
 
 ---
 
-## 🏗️ Lab Architecture
+## 📌 Table of Contents
 
-| Component        | Role                    
-|-----------------|-------------------------|
-| Ubuntu Server   | Wazuh SIEM Manager      | 
-| Windows 10 VM   | Target / Wazuh Agent    | 
-| Kali Linux      | Attacker Machine        | 
-
----
-
-## ⚔️ Attacks Simulated
-
-### 🦠 Malware Simulation
-- EICAR test file deployment via HTTP server
-- LOLBin technique using certutil for file download
-- Windows Defender detection and quarantine analysis
-- Real-time FIM (File Integrity Monitoring) alerts
-
-### 💻 Windows Attack Scenarios
-- Suspicious PowerShell execution
-  - Base64 encoded commands (T1027)
-  - IEX download cradle / fileless execution (T1059.001)
-  - Defender disable attempt (T1562.001)
-- Privilege escalation reconnaissance
-  - Scheduled task enumeration (T1053)
-  - Service path discovery (T1082)
-  - Local account enumeration (T1087)
-- System & Network reconnaissance
-  - whoami /all, net user, netstat
-  - wmic service enumeration
-  - Registry query analysis
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Current Deployments](#current-deployments)
+- [Tools & Technologies](#tools--technologies)
+- [Getting Started](#getting-started)
+- [Repository Structure](#repository-structure)
+- [Roadmap](#roadmap)
+- [Author](#author)
 
 ---
 
-## 🔍 SOC L1 Analysis Performed
+## Overview
 
-- Alert triage and severity classification
--  MITRE ATT&CK technique mapping
--  Attack timeline reconstruction
--  IOC (Indicator of Compromise) documentation
--  Wazuh rule analysis (Rule IDs: 92201, 92021, 60107, 60104)
--  Incident report writing
--  Log correlation across multiple events
--  Windows Event ID analysis (4688, 4625, 4672, 5001)
+This repository serves as the complete documentation hub for my **Home SOC Lab** — a virtualized security monitoring environment designed to simulate enterprise-grade threat detection using open-source tools.
 
----
+The lab covers:
+- **Endpoint monitoring** via Sysmon on Windows
+- **Centralized SIEM** via Wazuh (Manager + Agents)
+- **File Integrity Monitoring (FIM)** for real-time file change detection
+- **Vulnerability Detection** using Wazuh's built-in scanner
+- **MITRE ATT&CK** mapping of triggered alerts
+- **Custom alerting** with webhook-based notifications
+- **Threat Intelligence** integration with VirusTotal
 
-## 🗺️ MITRE ATT&CK Coverage
-
-| Tactic             | Technique ID  | Description                    |
-|--------------------|--------------|--------------------------------|
-| Execution          | T1059.001    | PowerShell                     |
-| Execution          | T1059.003    | CMD / certutil                 |
-| Defense Evasion    | T1027        | Obfuscated/Encoded Commands    |
-| Defense Evasion    | T1562.001    | Disable Windows Defender       |
-| Defense Evasion    | T1070.004    | File Deletion                  |
-| Defense Evasion    | T1105        | Ingress Tool Transfer          |
-| Discovery          | T1082        | System Information Discovery   |
-| Discovery          | T1087        | Account Discovery              |
-| Discovery          | T1049        | Network Connection Discovery   |
-| Discovery          | T1069        | Permission Group Discovery     |
-| Discovery          | T1053        | Scheduled Task Enumeration     |
+> 🚧 This repository is actively growing. Future deployments including **OpenCTI**, **TheHive**, **Cortex**, and more will be added as the lab expands.
 
 ---
 
-## 🛠️ Tools & Technologies
+## Architecture
 
-- **SIEM:** Wazuh 4.x (OpenSearch backend)
-- **Attacker:** Kali Linux (certutil, smbclient, python3 HTTP)
-- **Target:** Windows 10 with Wazuh Agent + Sysmon
-- **Monitoring:** Windows Event Logs, Sysmon, FIM, Rootcheck
-- **Visualization:** Wazuh Threat Hunting, MITRE ATT&CK map
-- **Hypervisor:** VMware Workstation
+
+<img width="800" height="533" alt="image" src="https://github.com/user-attachments/assets/8a444e1a-d130-4bd8-89c4-a4ddfd27c53d" />
+
 
 ---
 
+## Current Deployments
 
-## 📁 Repository Structure
+### ✅ 1. Sysmon — Windows Endpoint Monitoring
+**File:** [`Sysmon.pdf`](./Sysmon.pdf)
 
-\`\`\`
+Microsoft Sysinternals Sysmon installed on the Windows 10 client for deep endpoint telemetry.
 
+**What it captures:**
+- Process creation (Event ID 1)
+- Network connections
+- File creation/modification
+- Registry activity
 
+**Key steps covered:**
+- Download & install Sysmon with SwiftOnSecurity config
+- Verify logging in Windows Event Viewer
+- Forward Sysmon logs to Wazuh via `ossec.conf` localfile block
+- SOC-level test using `notepad.exe` process creation
+
+---
+
+### ✅ 2. Wazuh Agent — Windows Installation & Registration
+**File:** [`Wazu_Agent_installation_at_windows.pdf`](./Wazu_Agent_installation_at_windows.pdf)
+
+Wazuh agent (v4.14.4) deployed on Windows 10, registered and connected to the Ubuntu Wazuh Manager.
+
+**Key steps covered:**
+- Download Windows `.msi` installer
+- Add agent on server via `manage_agents` and extract authentication key
+- Import key into Windows agent GUI
+- Start agent service and verify connectivity
+- Multiple verification methods: CLI, real-time logs, and dashboard GUI
+
+---
+
+### ✅ 3. Wazuh Manager & Agent Configurations
+**File:** [`Wazu_Manager_and_Wazu_agent_Configurations_.pdf`](./Wazu_Manager_and_Wazu_agent_Configurations_.pdf)
+
+Advanced configuration of both the Wazuh Manager (Ubuntu) and the Windows agent to enable missing security modules.
+
+**Modules enabled & configured:**
+
+| Module | Description |
+|---|---|
+| **File Integrity Monitoring (FIM)** | Real-time monitoring of Downloads, Desktop, Temp folders. Triggers Rules 550/553/554 |
+| **Vulnerability Detection** | Enabled on Wazuh Manager; scans agents for known CVEs |
+| **Alert Monitor** | Custom `High-Severity-Attack-Alert` monitor with webhook channel |
+| **VirusTotal Integration** | Syscheck events forwarded to VirusTotal for hash reputation |
+| **MITRE ATT&CK Mapping** | Alerts mapped to ATT&CK techniques (e.g., T1565 Stored Data Manipulation) |
+
+---
+
+### ✅ 4. Wazuh Server Installation
+**File:** [`Wazuh Server Installation.txt`](./Wazuh%20Server%20Installation.txt)
+
+Base installation of the Wazuh server stack on Ubuntu.
+
+---
+
+## Tools & Technologies
+
+| Tool | Role | Platform |
+|---|---|---|
+| **Wazuh** | SIEM / XDR / Log Analysis | Ubuntu Server |
+| **Sysmon** | Endpoint Telemetry | Windows 10 |
+| **OpenSearch / Kibana** | Dashboard & Search | Ubuntu Server |
+| **VirusTotal API** | Threat Intelligence | Integration |
+| **Webhook.site** | Alert Testing | External |
+| **VMware Workstation** | Virtualization | Host |
+
+---
+
+## Getting Started
+
+> Prerequisites: VMware (or VirtualBox), Ubuntu 22.04 ISO, Windows 10 ISO
+
+### Recommended Deployment Order
+
+```
+1. Deploy Ubuntu VM → Install Wazuh Server
+2. Deploy Windows 10 VM → Install Sysmon
+3. Install & Register Wazuh Agent on Windows
+4. Configure ossec.conf (FIM, Sysmon logs, Syscheck)
+5. Enable Vulnerability Detection on Manager
+6. Set up Alert Monitors & Webhook Channels
+7. Integrate VirusTotal
+8. Validate: Run FIM tests, check Wazuh Dashboard
+```
+
+Each step has a dedicated PDF guide in this repository with screenshots and commands.
+
+---
+
+## Repository Structure
+
+```
 home-soc-lab/
 │
-├── 📂 configs/
-│   ├── ossec.conf              # Wazuh Windows agent config
-│   └── wazuh-manager.conf      # Wazuh server config
+├── README.md                                  
+├── Wazuh Server Installation.txt              ← Wazuh server setup
+├── Wazu_Agent_installation_at_windows.pdf     ← Agent deployment guide
+├── Wazu_Manager_and_Wazu_agent_Configurations_.pdf  ← Config & module setup
+├── Sysmon.pdf                                 ← Sysmon install & Wazuh integration
 │
-├── 📂 attack-simulations/
-│   ├── malware-simulation.md   # EICAR attack walkthrough
-│   ├── powershell-attacks.md   # PS attack commands + analysis
-│   └── privilege-escalation.md # PrivEsc recon documentation
-│
-├── 📂 incident-reports/
-│   ├── IR-001-EICAR-Malware.md      # Malware incident report
-│   ├── IR-002-PowerShell-Attack.md  # PS attack report
-│   └── IR-003-Recon-Activity.md     # Reconnaissance report
-│
-├── 📂 wazuh-analysis/
-│   ├── alert-screenshots/      # Wazuh dashboard screenshots
-│   ├── rule-analysis.md        # Rule ID documentation
-│   └── mitre-mapping.md        # ATT&CK technique mapping
-│
-├── 📂 ioc-collection/
-│   └── iocs.md                 # All IOCs from simulations
-│
-└── README.md
-\`\`\`
+└──
+```
 
 ---
 
+## Roadmap
 
-##  Key Wazuh Alerts Detected
-
-| Rule ID | Level | Description                              |
-|---------|-------|------------------------------------------|
-| 92201   | 9 🔴  | PowerShell created new scripting engine  |
-| 92021   | 3 🟡  | PowerShell used to delete files          |
-| 60107   | 4 🟡  | Failed privileged operation attempt      |
-| 60104   | 5 🟠  | Windows audit failure event              |
-| 67027   | 3 🟢  | New process created                      |
-| 61109   | 5 🟠  | WPAD name resolution timeout             |
-| 92154   | 4 🟡  | taskschd.dll loaded (persistence risk)   |
-
----
-
-##  Skills Demonstrated
-
-\`\`\`
-Blue Team
-  ├── SIEM configuration and tuning (Wazuh)
-  ├── Alert triage and investigation
-  ├── Log analysis (Windows Event Logs + Sysmon)
-  ├── Incident response documentation
-  ├── IOC identification and collection
-  └── MITRE ATT&CK framework mapping
-
-Red Team (Attack Simulation)
-  ├── Malware delivery via HTTP server
-  ├── LOLBin abuse (certutil, PowerShell)
-  ├── Defense evasion techniques
-  ├── System and network reconnaissance
-  └── Fileless attack simulation (IEX cradle)
-\`\`\`
+- [x] Wazuh Server Installation
+- [x] Wazuh Agent on Windows
+- [x] Sysmon Integration
+- [x] File Integrity Monitoring (FIM)
+- [x] Vulnerability Detection
+- [x] Custom Alert Monitors
+- [x] VirusTotal Integration
+- [x] MITRE ATT&CK Mapping
+- [ ] **OpenCTI** — Threat Intelligence Platform
+- [ ] **TheHive** — Incident Response Platform
+- [ ] **Cortex** — Automated Analysis
+- [ ] **Shuffle** — SOAR Automation
+- [ ] **Suricata** — Network IDS/IPS
+- [ ] **Zeek** — Network Traffic Analysis
+- [ ] **Kali Linux** — Attack Simulation VM
+- [ ] **DVWA** — Vulnerable Web App for testing
 
 ---
 
-##  What I Learned
+## Author
 
-- How attackers use built-in Windows tools (LOLBins) 
-  to evade detection
-- How SIEM rules correlate multiple events into 
-  meaningful alerts
-- The importance of behavioral detection over 
-  signature-based detection
-- How to reconstruct an attack timeline from logs
-- Real SOC L1 analyst workflow from alert to 
-  escalation
+**Malaika Umbreen**
+Home SOC Lab | Cybersecurity Analyst
 
 ---
 
-## ⚠️ Disclaimer
-
-> This lab and all attack simulations were performed 
-> in an isolated virtual environment for educational 
-> purposes only. All techniques documented here are 
-> for defensive security learning. Never use these 
-> techniques on systems you do not own or have 
-> explicit written permission to test.
-
----
-
-## 👩‍💻 Author
-
-**Malaika**  
-Aspiring SOC Analyst | Blue Team Enthusiast  
-
-*Built as part of self-directed cybersecurity 
-training toward SOC L1 certification*
+> ⭐ If this lab documentation helps you build your own SOC, consider starring the repo!
+> 
+> 📬 Contributions, suggestions, and PRs are welcome as this lab grows.
