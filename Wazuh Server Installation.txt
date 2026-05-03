@@ -1,0 +1,149 @@
+			Wazuh Server installation
+
+
+# BEFORE YOU START (Important Setup)
+
+Make sure your VM has at least:
+
+* ✅ **4 GB RAM** (minimum for stability)
+* ✅ **2 CPU cores**
+* ✅ **40+ GB disk**
+* ✅ Internet is stable
+
+Check your IP:
+
+```bash
+ip a
+sudo dhclient -v -r
+sudo dhclient -v
+```
+
+
+---
+
+# 🧹 STEP 1: Update System
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl apt-transport-https unzip wget -y
+```
+
+---
+
+# 🌐 STEP 2: Download Wazuh Installer
+
+```bash
+curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh
+```
+
+---
+
+#  STEP 3: Run Installation (All-in-One)
+
+###  Recommended (normal install)
+
+```bash
+sudo bash wazuh-install.sh -a
+```
+
+---
+
+###  If your VM has low RAM
+
+```bash
+sudo bash wazuh-install.sh -a -i
+```
+
+👉 `-i` = ignore hardware check
+
+---
+
+# ⏳ STEP 4: Wait (VERY IMPORTANT)
+
+Installation will:
+
+1. Install Indexer
+2. Install Manager
+3. Install Dashboard
+
+
+---
+
+# 🔑 STEP 5: Save Credentials
+
+At the end you’ll see:
+
+```bash
+User: admin
+Password: ********
+```
+
+👉 SAVE THIS PASSWORD
+
+---
+
+# 🌍 STEP 6: Access Dashboard
+
+Open browser:
+
+```bash
+https://YOUR_VM_IP
+```
+
+Example:
+
+```bash
+https://192.168.xx.xx
+```
+
+⚠️ Ignore SSL warning → proceed
+
+---
+
+# 🔥 STEP 7: Allow Firewall (if needed)
+
+```bash
+sudo ufw allow 443/tcp
+sudo ufw allow 1514/tcp
+sudo ufw allow 1515/tcp
+sudo ufw reload
+```
+
+---
+
+#  STEP 8: Check Services
+
+```bash
+sudo systemctl status wazuh-manager
+sudo systemctl status wazuh-indexer
+sudo systemctl status wazuh-dashboard
+```
+
+👉 All should be **active (running)**
+
+---
+
+#  OPTIONAL (Good Practice)
+
+Check logs if needed:
+
+```bash
+sudo tail -f /var/log/wazuh-install.log
+```
+
+---
+
+#  COMMON ISSUES (Quick Fixes)
+
+###  Dashboard not opening
+
+```bash
+sudo systemctl restart wazuh-indexer
+sudo systemctl restart wazuh-manager
+sudo systemctl restart wazuh-dashboard
+```
+
+---
+
+
+
